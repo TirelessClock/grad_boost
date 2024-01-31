@@ -20,7 +20,7 @@ double giniIndex(vector<double> &v) {
     return gI;
 }
 
-class Node {
+class TrainNode {
 
     vector<vector<double>> dataset; 
     vector<double> result;
@@ -32,12 +32,12 @@ class Node {
 
     public:
 
-    Node* left; 
-    Node* right; 
+    TrainNode* left; 
+    TrainNode* right; 
     int colToConsider; 
     double threshold;
 
-    Node(vector<vector<double>> dataset, vector<double> result, double k, double giniImpurity) {
+    TrainNode(vector<vector<double>> dataset, vector<double> result, double k, double giniImpurity) {
         this->dataset = dataset; 
         this->result = result; 
         
@@ -105,13 +105,12 @@ class Node {
 
             if(gG > giniGain) {
                 giniGain = gG; 
-                if(dataLeft.size() > 0) left = new Node(dataLeft, resultLeft, allowedDepth-1, gILeft);
-                if(dataRight.size() > 0)right = new Node(dataRight, resultRight, allowedDepth-1, gIRight);
+                if(dataLeft.size() > 0) left = new TrainNode(dataLeft, resultLeft, allowedDepth-1, gILeft);
+                if(dataRight.size() > 0) right = new TrainNode(dataRight, resultRight, allowedDepth-1, gIRight);
                 
                 colToConsider = col;
                 threshold = pivot;
             }
-
         }
     }
 
@@ -137,52 +136,95 @@ class Node {
 
 };
 
-class DecisionTree {
-
-    Node* root; 
+class Node {
     
-    void treeSplit(Node* root) {
-        
-        if(!root) return;
-        
-        root->determineSplit();
-        
-        treeSplit(root->left);
-        treeSplit(root->right);
+    public: 
+
+    Node* left; 
+    Node* right;
+    
+    int colToConsider;
+    double threshold;
+    double res;
+
+    Node(int colToConsider, double threshold) {
+        this->colToConsider = colToConsider;
+        this->threshold = threshold;
+
+        left = nullptr;
+        right = nullptr;
+        res = -1;
     }
 
-    double predictionBackend(Node* node, vector<double>& newData) {
-        if(node->isLeaf()) return node->returnResults();
+    bool isLeaf() {
+        return (left == nullptr and right == nullptr);
+    }
 
-        if(newData[node->colToConsider] <= node->threshold) return predictionBackend(node->left, newData);
-        else return predictionBackend(node->right, newData);
+};
+
+class DecisionTree {
+
+    TrainNode* TrainRoot;
+    Node* root; 
+
+    Node* createTree(TrainNode* TrainNode) {
+        Node* node = new Node(TrainNode->colToConsider, TrainNode->threshold);
+        if(TrainNode->isLeaf()) {
+            node->res = TrainNode->returnResults();
+        }
+        if(TrainNode->left) node->left = createTree(TrainNode->left);
+        if(TrainNode->right) node->right = createTree(TrainNode->right);
+        
+        delete TrainNode;
+        return node;
+    }
+    
+    void treeSplit(TrainNode* TrainRoot) {
+        
+        if(!TrainRoot) return;
+        
+        TrainRoot->determineSplit();
+        
+        treeSplit(TrainRoot->left);
+        treeSplit(TrainRoot->right);
+    }
+
+    double predictionBackend(Node* Node, vector<double>& newData) {
+        if(Node->isLeaf()) return Node->res;
+
+        if(newData[Node->colToConsider] <= Node->threshold) return predictionBackend(Node->left, newData);
+        else return predictionBackend(Node->right, newData);
+    }
+
+    void printBackend(Node* node) {
+        if(!node) return;
+        if(node->isLeaf()) {
+            cout<<node<<": "<<node->colToConsider<<", "<<node->threshold<<" Leaf Reached."<<endl;
+            return;
+        }
+        cout<<node<<": "<<node->colToConsider<<", "<<node->threshold<<endl;
+
+        cout<<"Left: ";
+        printBackend(node->left);
+        cout<<"Right: ";
+        printBackend(node->right);
     }
 
     public: 
 
-    DecisionTree(vector<vector<double>> data, double k, int yIndex) {
+    DecisionTree(vector<vector<double>> dataset, vector<double> result, double k) {
 
         cout<<"Decision Tree instance created!"<<endl;
-
-        vector<vector<double>> dataset(data.size());
-        vector<double> result; 
-
-        for(int i=0; i<data.size(); i++) {
-            for(int j=0; j<data[i].size(); j++) {
-                if(j == yIndex) {
-                    result.push_back(data[i][j]);
-                }
-                else {
-                    dataset[i].push_back(data[i][j]);
-                }
-            }
-        }
-
-        root = new Node(dataset, result, k, -1);
-        treeSplit(root);
+        TrainRoot = new TrainNode(dataset, result, k, -1);
+        treeSplit(TrainRoot);
+        root = createTree(TrainRoot);
     }
 
     double predict(vector<double> newData) {
         return predictionBackend(root, newData);
+    }
+
+    void printTree() {
+        printBackend(root);
     }
 };
