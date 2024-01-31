@@ -1,4 +1,4 @@
-#include "DecisionTree.h"
+#include "GradientBoosting.h"
 #include<iostream>
 #include<vector>
 using namespace std; 
@@ -7,14 +7,13 @@ int main() {
 
     vector<vector<double>> data = 
     {
-        {0,10,100},
-        {1,20,180},
-        {0,50,160},
-        {1,32,150},
-        {1,5,80},
+        {0,10,100,10},
+        {1,20,180,20},
+        {0,50,160,20},
+        {1,32,150,20},
+        {1,5,80,10},
     };
 
-    DecisionTree dt(data, {10,20,20,20,10}, 5); 
-    dt.printTree();
-    cout<<"Result: "<<dt.predict({1,15,160})<<endl;
+    GradientBoosting gb(data, 3, 5, 3);
+    cout<<"Result: "<<gb.predict({1,15,160})<<endl;
 }
