@@ -215,6 +215,30 @@ class DecisionTree {
     DecisionTree(vector<vector<double>> dataset, vector<double> result, double k) {
 
         cout<<"Decision Tree instance created!"<<endl;
+        
+        TrainRoot = new TrainNode(dataset, result, k, -1);
+        treeSplit(TrainRoot);
+        root = createTree(TrainRoot);
+    }
+
+    DecisionTree(vector<vector<double>> data, int yIndex, double k) {
+        
+        cout<<"Decision Tree instance created!"<<endl;
+        
+        vector<vector<double>> dataset(data.size()); 
+        vector<double> result;
+
+        for(int i=0; i<data.size(); i++) {
+            for(int j=0; j<data[i].size(); j++) {
+                if(j == yIndex) {
+                    result.push_back(data[i][j]);
+                }
+                else {
+                    dataset[i].push_back(data[i][j]);
+                }
+            }
+        }
+
         TrainRoot = new TrainNode(dataset, result, k, -1);
         treeSplit(TrainRoot);
         root = createTree(TrainRoot);

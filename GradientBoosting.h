@@ -26,6 +26,15 @@ class GradientBoosting {
 
     public:
 
+    GradientBoosting(vector<vector<double>> dataset, vector<double> result, int numberModels, int depthTree) {
+
+        cout<<"Gradient Boosting model created!"<<endl;
+
+        this->numberModels = numberModels;
+        models.resize(numberModels);
+        trainModels(dataset, result, depthTree);
+    }
+
     GradientBoosting(vector<vector<double>> data, int numberModels, int depthTree, int yIndex) {
 
         cout<<"Gradient Boosting model created!"<<endl;
