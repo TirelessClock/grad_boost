@@ -1,19 +1,27 @@
-#include "GradientBoosting.h"
-#include<iostream>
-#include<vector>
+#include "GradientBoosting.hpp"
+#include "DecisionTree.hpp"
+#include "GetData.hpp"
+#include <iostream>
+#include <vector>
 using namespace std; 
+
+void display(vector<vector<double>> &data) {
+    for (const auto& row : data) {
+        for (const auto& cell : row) {
+            cout << cell << "\t";
+        }
+        cout << "\n";
+    }
+}
 
 int main() {
 
-    vector<vector<double>> data = 
-    {
-        {0,10,100,10},
-        {1,20,180,20},
-        {0,50,160,20},
-        {1,32,150,20},
-        {1,5,80,10},
-    };
+    vector<vector<double>> data = preprocess("data.csv", true);
 
-    GradientBoosting gb(data, 3, 5, 3);
-    cout<<"Result: "<<gb.predict({1,15,160})<<endl;
+    GradientBoosting gb(data, 4, 5, 5, "MAE");
+
+    cout<<"Result: "<<gb.predict({6.8,3.0,5.5,2.1})<<"\n";
+
+    return 0;
 }
+

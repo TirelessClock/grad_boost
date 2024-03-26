@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <unordered_map>
@@ -52,7 +54,7 @@ class TrainNode {
     }
 
     bool isLeaf() {
-        return (allowedDepth == 0 or numRows <= 1);
+        return (allowedDepth == 0 || numRows <= 1);
     }
 
     void determineSplit() {
@@ -75,7 +77,7 @@ class TrainNode {
             sort(temp.begin(), temp.end());
 
             double mid = numRows/2 - 1;
-            while(mid < numRows-1 and temp[mid] == temp[mid+1]) {mid++;} 
+            while(mid < numRows-1 && temp[mid] == temp[mid+1]) {mid++;} 
 
             double pivot = temp[mid];
  
@@ -134,6 +136,8 @@ class TrainNode {
 
     }
 
+    ~TrainNode() {};
+
 };
 
 class Node {
@@ -157,8 +161,10 @@ class Node {
     }
 
     bool isLeaf() {
-        return (left == nullptr and right == nullptr);
+        return (left == nullptr && right == nullptr);
     }
+
+    ~Node() {}
 
 };
 
@@ -214,7 +220,7 @@ class DecisionTree {
 
     DecisionTree(vector<vector<double>> dataset, vector<double> result, double k) {
 
-        cout<<"Decision Tree instance created!"<<endl;
+        // cout<<"Decision Tree instance created!"<<endl;
         
         TrainRoot = new TrainNode(dataset, result, k, -1);
         treeSplit(TrainRoot);
@@ -223,7 +229,7 @@ class DecisionTree {
 
     DecisionTree(vector<vector<double>> data, int yIndex, double k) {
         
-        cout<<"Decision Tree instance created!"<<endl;
+        // cout<<"Decision Tree instance created!"<<endl;
         
         vector<vector<double>> dataset(data.size()); 
         vector<double> result;
@@ -251,4 +257,6 @@ class DecisionTree {
     void printTree() {
         printBackend(root);
     }
+
+    ~DecisionTree() {}
 };
